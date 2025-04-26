@@ -1,177 +1,376 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Grid-Layout mit linkem Container und korrekter Reihenfolge</title>
-  <style>
-    /* Reset */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    html, body {
-      height: 100%;
-    }
+    <meta charset="UTF-8">
+    <title>ontime - Inspizienz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="ovenplayer.js"></script>
+    <style>
+        /* Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    /* Haupt-Grid: 2 Spalten, 3 Zeilen (8px Balken + zwei gleich große Reihen) */
-    .container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      height: 100%;
-      background: #333;
-      padding: 10px;
-    }
+        html,
+        body {
+            height: 100%;
+            font-family: var(--font-family-override, "Open Sans", "Segoe UI", sans-serif);
+        }
 
-    /* LINKER BEREICH als eigenes Grid mit 2 Spalten für die Video-Zeile */
-    .left {
-      grid-column: 1;
-      grid-row: 1 / span 3;
-      display: grid;
-      /* 2 Spalten: 3fr für Haupt-Video, 1fr für Sidebar */
-      /* 3 Zeilen: 8px Balken, 1fr Cue, 1fr Video+Sidebar */
-      grid-template-columns: 3fr 1fr;
-      grid-template-rows: 8px 1fr 1fr;
-      gap: 10px;
-      height: 100%;
-      width: 100%;
-    }
-    .aktueller-cue-bar {
-      grid-column: 1 / span 2;
-      grid-row: 1;
-      background: red;
-    }
-    .aktueller-cue {
-      grid-column: 1 / span 2;
-      grid-row: 2;
-      background: #888;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5em;
-      color: #000;
-    }
-    .video-inner {
-      grid-column: 1;
-      grid-row: 3;
-      background: #004fbb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 1.2em;
-      width: 100%;
-      height: 100%;
-      aspect-ratio: 16 / 9;
-    }
-    .video-sidebar {
-      grid-column: 2;
-      grid-row: 3;
-      background: #008aff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 1em;
-    }
+        /* Haupt-Grid: 2 Spalten, 3 Zeilen (8px Balken + zwei gleich große Reihen) */
+        .container {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 10px;
+            height: 100%;
+            background: #101010;
+            padding: 10px;
+        }
 
-    /* RECHTER BEREICH: Information, Uhr, nächster Cue, drei demnächst-Felder, Controls */
-    .right {
-      grid-column: 2;
-      grid-row: 1 / span 3;
-      display: grid;
-      height: 100%;
-      grid-template-columns: 7fr 2fr;
-      grid-template-rows:
-        0.3fr   /* Informationen/Uhr */
-        0.3fr   /* Informationen/Uhr */
-        50%     /* nächster Cue */
-        0.75fr  /* demnächst 1 */
-        0.75fr  /* demnächst 2 */
-        0.75fr  /* demnächst 3 */
-        0.75fr; /* Controls */
-      gap: 10px;
-    }
-    .information {
-      grid-column: 1;
-      grid-row: 1 / span 2;
-      background: #6f9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-    }
-    .uhr {
-      grid-column: 2;
-      grid-row: 1 / span 2;
-      background: #aaa;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .naechster-cue {
-      grid-column: 1 / span 2;
-      grid-row: 3;
-      background: #888;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    /* demnächst-Felder mit eigenen Klassen für exakte Position */
-    .demnaechst1 {
-      grid-column: 1 / span 2;
-      grid-row: 4;
-      background: #888;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .demnaechst2 {
-      grid-column: 1 / span 2;
-      grid-row: 5;
-      background: #888;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .demnaechst3 {
-      grid-column: 1 / span 2;
-      grid-row: 6;
-      background: #888;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .controls {
-      grid-column: 1 / span 2;
-      grid-row: 7;
-      background: orange;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  </style>
+        .container>* {
+            min-width: 0;
+        }
+
+        /* LINKER BEREICH als eigenes Grid mit 2 Spalten für die Video-Zeile */
+        .left {
+            grid-column: 1;
+            grid-row: 1 / span 3;
+            display: grid;
+            /* 2 Spalten: 3fr für Haupt-Video, 1fr für Sidebar */
+            /* 3 Zeilen: 8px Balken, 1fr Cue, 1fr Video+Sidebar */
+            grid-template-columns: 6fr 1fr;
+            grid-template-rows: 13px 1fr 1fr;
+            gap: 10px;
+            height: 100%;
+            width: 100%;
+        }
+
+        .aktueller-cue-bar {
+            grid-column: 1 / span 2;
+            grid-row: 1;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 3px;
+            display: block;
+        }
+
+        .aktueller-cue-fortschritt {
+            background: #fa5656;
+            width: 10%;
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .aktueller-cue {
+            /* sorgt dafür, dass das Element über beide Columns geht */
+            grid-column: 1 / -1;
+
+            /* dein neues Inner-Grid */
+            display: grid;
+            grid-template-rows: min-content min-content 1fr;
+            gap: 8px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 8px;
+            font-size: 1.2em;
+        }
+
+        /* Titel-Zeile */
+        .cue-title {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Zeiten-Zeile */
+        .cue-times {
+            font-size: 0.9em;
+            text-align: center;
+            opacity: .8;
+        }
+
+        /* Infos-Zeile */
+        .cue-infos {
+            /* wenn dein Infotext überlaufen kann, ellipsen oder umbrechen */
+            overflow: auto;
+            /* scrollbar, falls es zu viel wird */
+            /* oder für Ellipse in einer Zeile: */
+            /* white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis; */
+        }
+
+        .video-inner {
+            grid-column: 1;
+            grid-row: 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.2em;
+            /* aspect-ratio: 16 / 9; */
+        }
+
+        .video-sidebar {
+            grid-column: 2;
+            grid-row: 3;
+            background: rgba(255, 255, 255, 0.07);
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 1em;
+            gap: 40px;
+            text-transform: uppercase;
+            border-radius: 8px;
+        }
+
+        .paar {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* RECHTER BEREICH: Information, Uhr, nächster Cue, drei demnächst-Felder, Controls */
+        .right {
+            grid-column: 2;
+            grid-row: 1 / span 3;
+            display: grid;
+            height: 100%;
+            grid-template-columns: 10fr 2fr;
+            grid-template-rows:
+                0.3fr
+                /* Informationen/Uhr */
+                0.3fr
+                /* Informationen/Uhr */
+                50%
+                /* nächster Cue */
+                0.75fr
+                /* demnächst 1 */
+                0.75fr
+                /* demnächst 2 */
+                0.75fr
+                /* demnächst 3 */
+                0.75fr;
+            /* Controls */
+            gap: 10px;
+        }
+
+        .information {
+            grid-column: 1;
+            grid-row: 1 / span 2;
+            font-size: 25px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            min-width: 0;
+        }
+
+        .text-abbruch {
+            display: block;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
+        }
+
+        .uhr {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            padding: 10px 3px;
+            text-transform: uppercase;
+        }
+
+        /* kleines Label oben */
+        .uhr__label {
+            font-size: 0.875em;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.6);
+            align-self: flex-start;
+            margin-top: 1px;
+            /* links oben */
+        }
+
+        /* Zeitanzeige darunter */
+        .uhr__time {
+            font-size: 1.5em;
+            font-variant-numeric: tabular-nums;
+            margin-top: 1px;
+        }
+
+        .naechster-cue {
+            grid-column: 1 / span 2;
+            grid-row: 3;
+            background: rgba(255, 255, 255, 0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .demnaechst {
+            padding: 10px;
+            /* rundum etwas Luft */
+            display: flex;
+            flex-direction: column;
+            /* Label oben, Text darunter */
+            gap: 8px;
+            /* Abstand zwischen Label und Text */
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 8px;
+            /* die Grid-Position (column/row) bleibt unverändert */
+        }
+
+        /* das kleine Label oben links */
+        .demnaechst__label {
+            font-size: 0.875em;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            align-self: flex-start;
+            /* ganz links in der Box */
+        }
+
+        /* der variable Text darunter */
+        .demnaechst__text {
+            width: 100%;
+            /* über volle Breite der Box */
+            color: rgba(255, 255, 255, 0.6);
+            /* Beispiel-Farbe */
+            line-height: 1.3;
+            /* kein flex:1 nötig, passt sich der Textlänge an */
+        }
+
+        /* demnächst-Felder mit eigenen Klassen für exakte Position */
+        .demnaechst1 {
+            grid-column: 1 / span 2;
+            grid-row: 4;
+            background: rgba(255, 255, 255, 0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .demnaechst2 {
+            grid-column: 1 / span 2;
+            grid-row: 5;
+            background: rgba(255, 255, 255, 0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .demnaechst3 {
+            grid-column: 1 / span 2;
+            grid-row: 6;
+            background: rgba(255, 255, 255, 0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .controls {
+            grid-column: 1 / span 2;
+            grid-row: 7;
+            background: rgba(255, 255, 255, 0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .beschriftung {
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .werte {
+            color: var(--color-override, rgba(255, 255, 255, 0.8));
+        }
+
+        .wichtig {
+            font-weight: 600;
+        }
+    </style>
 </head>
+
 <body>
-  <div class="container">
-    <!-- linker Bereich -->
-    <div class="left">
-      <div class="aktueller-cue-bar"></div>
-      <div class="aktueller-cue">aktueller Cue</div>
-      <div class="video-inner">Video (16:9)</div>
-      <div class="video-sidebar">Sidebar</div>
+    <div class="container">
+        <!-- linker Bereich -->
+        <div class="left">
+            <div class="aktueller-cue-bar">
+                <div class="aktueller-cue-fortschritt"></div>
+            </div>
+            <div class="aktueller-cue">
+                <div class="cue-title">Titel</div>
+                <div class="cue-times">Zeiten</div>
+                <div class="cue-infos">
+                    Hier kommt dein ausführlicher Infotext, der sich über den Rest der Fläche erstreckt.
+                </div>
+            </div>
+            <div class="video-inner">
+                <div id="video"></div>
+            </div>
+            <div class="video-sidebar">
+                <div class="paar"><span class="beschriftung">Cue</span><span class="werte">000/000</span></div>
+                <div class="paar"><span class="beschriftung">Zeit in<br>Block</span><span class="werte">00:00:00</span>
+                </div>
+                <div class="paar"><span class="beschriftung">Offset</span><span class="werte">-00:00:00</span></div>
+            </div>
+        </div>
+        <!-- rechter Bereich mit korrekter Reihenfolge der demnächst-Felder -->
+        <div class="right">
+            <div class="information werte wichtig"><span class="text-abbruch">Abiball Goetheschule Wetzlar 2025</span>
+            </div>
+            <div class="uhr">
+                <div class="uhr">
+                    <div class="uhr__label beschriftung">Uhrzeit</div>
+                    <div class="uhr__time werte" id="clock">00:00:00</div>
+                </div>
+            </div>
+            <div class="naechster-cue">nächster Cue</div>
+            <div class="demnaechst demnaechst1">
+                <div class="demnaechst__label">demnächst</div>
+                <div class="demnaechst__text text-abbruch">Hier steht dein variabler Text Hier steht dein variabler Text
+                    Hier steht
+                    dein variabler Text</div>
+            </div>
+            <div class="demnaechst demnaechst2">
+                <div class="demnaechst__label">demnächst</div>
+                <div class="demnaechst__text text-abbruch">Hier steht dein variabler Text</div>
+            </div>
+            <div class="demnaechst demnaechst3">
+                <div class="demnaechst__label">demnächst</div>
+                <div class="demnaechst__text text-abbruch">Hier steht dein variabler Text</div>
+            </div>
+            <div class="controls">Controls</div>
+        </div>
     </div>
-    <!-- rechter Bereich mit korrekter Reihenfolge der demnächst-Felder -->
-    <div class="right">
-      <div class="information">Informationen</div>
-      <div class="uhr">Uhr</div>
-      <div class="naechster-cue">nächster Cue</div>
-      <div class="demnaechst1">demnächst</div>
-      <div class="demnaechst2">demnächst</div>
-      <div class="demnaechst3">demnächst</div>
-      <div class="controls">Controls</div>
-    </div>
-  </div>
 </body>
+
+<script>
+    const player = OvenPlayer.create("video", {
+        sources: [{
+            type: "webrtc",
+            file: "ws://IP-ADRESS:PORT"
+        }],
+        autoStart: true,
+        mute: true
+    });
+</script>
+
 </html>

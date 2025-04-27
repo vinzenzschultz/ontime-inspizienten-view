@@ -1,0 +1,399 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: var(--font-family-override, "Open Sans", "Segoe UI", sans-serif);
+  background: #101010;
+}
+
+/* Haupt-Grid: 2 Spalten, 3 Zeilen (8px Balken + zwei gleich große Reihen) */
+.container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  height: 100%;
+  background: #101010;
+  padding: 10px;
+}
+
+.container > * {
+  min-width: 0;
+}
+
+/* LINKER BEREICH als eigenes Grid mit 2 Spalten für die Video-Zeile */
+.left {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  display: grid;
+  /* 2 Spalten: 3fr für Haupt-Video, 1fr für Sidebar */
+  /* 3 Zeilen: 8px Balken, 1fr Cue, 1fr Video+Sidebar */
+  grid-template-columns: 6fr 1fr;
+  grid-template-rows: 13px 45vh 1fr;
+  gap: 10px;
+  height: 100%;
+  width: 100%;
+}
+
+.aktueller-cue-bar {
+  grid-column: 1 / span 2;
+  grid-row: 1;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 3px;
+  display: block;
+}
+
+.aktueller-cue-fortschritt {
+  background: #fa5656;
+  width: 0%;
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease-in-out, opacity 1s ease-in-out;
+}
+
+.aktueller-cue {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-rows: min-content min-content 1fr;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  font-size: 1.2em;
+}
+
+.cue-title {
+  font-weight: bold;
+  text-align: left !important;
+  padding-bottom: 4px;
+  margin-bottom: 0px;
+  border-bottom: 2px solid #101010;
+}
+
+.cue-times {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  padding: 0 10px 8px 10px;
+  margin-bottom: 0px;
+  border-bottom: 2px solid #101010;
+  box-sizing: border-box;
+}
+
+.cue-infos {
+  overflow-x: auto;
+  overflow-wrap: anywhere;
+  min-height: 100%;
+}
+
+.cue-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cue-infos__label {
+  font-size: 0.8em;
+  font-weight: bold;
+  text-transform: uppercase;
+  /* background-color: rgb(51, 158, 78); */
+  border-radius: 3px;
+  padding: 2px 4px;
+  align-self: flex-start;
+}
+
+.cue-infos__text {
+  flex: 1 1 auto;
+  font-size: 1em;
+  line-height: 1.3;
+  color: #000;
+  overflow: visible;
+  margin-top: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.zeit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0px;
+}
+
+/* Label oben (kleiner, transparent) */
+.zeit__label {
+  font-size: 0.75em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Wert unten (größer, tabular nums) */
+.zeit__value {
+  font-size: 1em;
+  font-variant-numeric: tabular-nums;
+  color: #000;
+  /* oder deine Wunsch-Farbe */
+}
+
+.video-inner {
+  grid-column: 1;
+  grid-row: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.2em;
+  /* aspect-ratio: 16 / 9; */
+}
+
+.video-sidebar {
+  grid-column: 2;
+  grid-row: 3;
+  background: rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-size: 1em;
+  gap: 40px;
+  text-transform: uppercase;
+  border-radius: 8px;
+}
+
+.paar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.right {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  display: grid;
+  height: 100%;
+  grid-template-columns: 10fr 2.2fr;
+  grid-template-rows: 0.3fr 0.3fr 45vh 0.75fr 0.75fr 0.75fr 0.75fr;
+  gap: 10px;
+}
+
+.information {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  font-size: 25px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  min-width: 0;
+}
+
+.text-abbruch {
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.uhr {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  padding: 10px 3px;
+  text-transform: uppercase;
+}
+
+/* kleines Label oben */
+.uhr__label {
+  font-size: 0.875em;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.6);
+  align-self: flex-start;
+  margin-top: 1px;
+  /* links oben */
+}
+
+/* Zeitanzeige darunter */
+.uhr__time {
+  font-size: 1.5em;
+  font-variant-numeric: tabular-nums;
+  margin-top: 1px;
+}
+
+.naechster-cue {
+  grid-column: 1 / span 2;
+  grid-row: 3;
+  display: grid;
+  grid-template-rows: min-content min-content 1fr;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  font-size: 1.2em;
+}
+
+.demnaechst {
+  padding: 10px;
+  /* rundum etwas Luft */
+  display: flex;
+  flex-direction: column;
+  /* Label oben, Text darunter */
+  gap: 8px;
+  /* Abstand zwischen Label und Text */
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  /* die Grid-Position (column/row) bleibt unverändert */
+}
+
+/* das kleine Label oben links */
+.demnaechst__label {
+  font-size: 0.875em;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+  align-self: flex-start;
+  /* ganz links in der Box */
+}
+
+/* der variable Text darunter */
+.demnaechst__text {
+  width: 100%;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 0.9;
+  font-size: 20px;
+}
+
+.demnaechst1 {
+  grid-column: 1 / span 2;
+  grid-row: 4;
+  background: rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.demnaechst2 {
+  grid-column: 1 / span 2;
+  grid-row: 5;
+  background: rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.demnaechst3 {
+  grid-column: 1 / span 2;
+  grid-row: 6;
+  background: rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.controls {
+  grid-column: 1 / span 2;
+  grid-row: 7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 10px;
+}
+
+.control-btn {
+  flex: 1;
+  /* alle Buttons gleich breit */
+  height: 100%;
+  /* volle Höhe des .controls-Containers */
+  font-size: 1.25em;
+  /* größere Schrift */
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.control-btn:disabled {
+  color: rgba(255, 255, 255, 0.45) !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+#lock-btn.locked {
+  color: rgb(51, 158, 78);
+}
+
+.beschriftung {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.beschriftung_dunkler {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.beschriftung_rot {
+  color: #fa5656;
+}
+
+.beschriftung_orange {
+  color: rgb(255, 171, 51);
+}
+
+.beschriftung_gruen {
+  color: rgb(51, 158, 78);
+}
+
+.werte {
+  color: var(--color-override, rgba(255, 255, 255, 0.8));
+}
+
+.wichtig {
+  font-weight: 600;
+}
+
+.paddingRechts {
+  padding-right: 10px;
+  text-transform: uppercase;
+}
+
+.blink {
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0% {
+    background-color: var(
+      --card-background-color-override,
+      rgba(255, 255, 255, 0.07)
+    );
+  }
+
+  50% {
+    background-color: var(--card-background-color-blink-override, #339e4e);
+  }
+
+  to {
+    background-color: var(
+      --card-background-color-override,
+      rgba(255, 255, 255, 0.07)
+    );
+  }
+}

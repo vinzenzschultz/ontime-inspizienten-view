@@ -112,7 +112,7 @@
             font-size: 0.8em;
             font-weight: bold;
             text-transform: uppercase;
-            background-color: rgb(51, 158, 78);
+            /* background-color: rgb(51, 158, 78); */
             border-radius: 3px;
             padding: 2px 4px;
             align-self: flex-start;
@@ -403,7 +403,7 @@
                 <div class="paar"><span class="beschriftung_dunkler">Cue</span><span class="beschriftung wichtig"
                         id="stage_time_position">--/--</span></div>
                 <div class="paar"><span class="beschriftung_dunkler">Zeit in<br>Block</span><span
-                        class="beschriftung wichtig">00:00:00</span>
+                        class="beschriftung wichtig block-zeit">00:00:00</span>
                 </div>
                 <div class="paar"><span class="beschriftung_dunkler">Offset</span><span
                         class="beschriftung wichtig stage_time_offset">--:--:--</span></div>
@@ -422,7 +422,7 @@
                 <div class="cue-title werte wichtig updateTitelNext">--</div>
                 <div class="cue-times">
                     <div class="zeit">
-                        <div class="zeit__label beschriftung_dunkler">erwarteter Beginn um</div>
+                        <div class="zeit__label beschriftung_dunkler">erwarteter Beginn</div>
                         <div class="zeit__value beschriftung stage_time_next_start">--:--:--</div>
                     </div>
                     <div class="zeit">
@@ -430,7 +430,7 @@
                         <div class="zeit__value beschriftung stage_time_next_ende">--:--:--</div>
                     </div>
                     <div class="zeit">
-                        <div class="zeit__label beschriftung_dunkler">Stage Timer</div>
+                        <div class="zeit__label beschriftung_dunkler">Stage Time</div>
                         <div class="zeit__value beschriftung stage_time_next">--:--:--</div>
                     </div>
                 </div>
@@ -442,17 +442,15 @@
             </div>
             <div class="demnaechst demnaechst1">
                 <div class="demnaechst__label">demnächst</div>
-                <div class="demnaechst__text text-abbruch">Hier steht dein variabler Text Hier steht dein variabler Text
-                    Hier steht
-                    dein variabler Text</div>
+                <div class="demnaechst__text text-abbruch demnaechst1-label">--</div>
             </div>
             <div class="demnaechst demnaechst2">
                 <div class="demnaechst__label">demnächst</div>
-                <div class="demnaechst__text text-abbruch">Hier steht dein variabler Text</div>
+                <div class="demnaechst__text text-abbruch demnaechst2-label">--</div>
             </div>
             <div class="demnaechst demnaechst3">
                 <div class="demnaechst__label">aktueller Block</div>
-                <div class="demnaechst__text text-abbruch">Akt 1</div>
+                <div class="demnaechst__text text-abbruch aktueller-block">--</div>
             </div>
             <div class="controls">Controls</div>
         </div>

@@ -12,16 +12,25 @@ function updateProjectHeader(name) {
 
 function updateTitelNow(name) {
     if (name == null) {
-        document.querySelector('.updateTitelNow').textContent = "--"
+        document.querySelector('.updateTitelNow').textContent = "--";
     } else {
         document.querySelector('.updateTitelNow').textContent = name;
         makeTitleCardBlinkGreen();
     }
 }
 
+function updateAktuellerBlock(name) {
+    if (name == null) {
+        document.querySelector('.aktueller-block').textContent = "--";
+    } else {
+        document.querySelector('.aktueller-block').textContent = name;
+        makeTitleCardBlinkGreen();
+    }
+}
+
 function updateTitelNext(name) {
     if (name == null) {
-        document.querySelector('.updateTitelNext').textContent = "--"
+        document.querySelector('.updateTitelNext').textContent = "--";
     } else {
         document.querySelector('.updateTitelNext').textContent = name;
         makeTitleCardBlinkGreen();
@@ -29,6 +38,9 @@ function updateTitelNext(name) {
 }
 
 function updatePosition(zaehler, nenner) {
+    if (zaehler == null) {
+        zaehler = '--';
+    }
     document.getElementById('stage_time_position').innerText = String(zaehler) + "/" + String(nenner);
 }
 
@@ -209,62 +221,140 @@ function makeTitleCardBlinkGreen() {
     }
 }
 
-function updateInfos(customData) {
-    // Container auswählen (passt ggf. den Selector an, wenn du mehrere .cue-info hast)
+async function updateInfos(customData) {
+    // 1) Container auswählen
     const container = document.querySelector('.cue-info-aktuell');
     if (!container) return;
 
-    // Alle alten Einträge entfernen
+    // 2) Farben per HTTP laden
+    let colorMap = {};
+    try {
+        const res = await fetch('/data/custom-fields', {
+            headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+            colorMap = await res.json();
+        } else {
+            console.warn(`Fetch Farben fehlgeschlagen: ${res.status}`);
+        }
+    } catch (err) {
+        console.error('Fehler beim Laden der Custom-Farben:', err);
+    }
+
+    // 3) Alte Einträge entfernen
     container.innerHTML = '';
 
-    // Für jeden Eintrag in customData ein neues DIV bauen
+    // 4) Neue Einträge bauen
     Object.entries(customData).forEach(([key, value]) => {
-        // Wrapper DIV
         const wrapper = document.createElement('div');
 
-        // Label
+        // Label mit Farbe aus colorMap (Fallback #888)
         const label = document.createElement('span');
         label.classList.add('cue-infos__label');
         label.textContent = key;
+        label.style.backgroundColor = colorMap[key].colour || 'rgba(255, 255, 255, 0.8)';
 
         // Text
         const text = document.createElement('div');
         text.classList.add('cue-infos__text', 'beschriftung');
         text.textContent = value;
 
-        // Einfügen
         wrapper.append(label, text);
         container.append(wrapper);
     });
 }
 
-function updateNextInfos(customData) {
-    // Container auswählen (passt ggf. den Selector an, wenn du mehrere .cue-info hast)
+async function updateNextInfos(customData) {
+    // 1) Container auswählen
     const container = document.querySelector('.cue-info-next');
     if (!container) return;
 
-    // Alle alten Einträge entfernen
+    // 2) Farben per HTTP laden
+    let colorMap = {};
+    try {
+        const res = await fetch('/data/custom-fields', {
+            headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+            colorMap = await res.json();
+        } else {
+            console.warn(`Fetch Farben fehlgeschlagen: ${res.status}`);
+        }
+    } catch (err) {
+        console.error('Fehler beim Laden der Custom-Farben:', err);
+    }
+
+    // 3) Alte Einträge entfernen
     container.innerHTML = '';
 
-    // Für jeden Eintrag in customData ein neues DIV bauen
+    // 4) Neue Einträge bauen
     Object.entries(customData).forEach(([key, value]) => {
-        // Wrapper DIV
         const wrapper = document.createElement('div');
 
-        // Label
+        // Label mit Farbe aus colorMap (Fallback #888)
         const label = document.createElement('span');
         label.classList.add('cue-infos__label');
         label.textContent = key;
+        label.style.backgroundColor = colorMap[key].colour || 'rgba(255, 255, 255, 0.8)';
 
         // Text
         const text = document.createElement('div');
         text.classList.add('cue-infos__text', 'beschriftung');
         text.textContent = value;
 
-        // Einfügen
         wrapper.append(label, text);
         container.append(wrapper);
     });
+}
+
+async function updateNextTwoCues() {
+    try {
+        const res = await fetch('/data/rundown', {
+            headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+            // 1. Array: zuerst alle block-Items rausfiltern,
+            //    dann auf jedem verbleibenden Element rekursiv anwenden.
+            return data
+                .filter(item => !(item && item.type === 'block'))
+                .map(item => filterOutBlocks(item));
+        }
+        else if (data !== null && typeof data === 'object') {
+            // 2. Objekt: für jede Property rekursiv anwenden
+            const result = {};
+            for (const [key, val] of Object.entries(data)) {
+                const filteredVal = filterOutBlocks(val);
+                // optional: nur setzen, wenn filteredVal nicht undefined ist
+                if (filteredVal !== undefined) {
+                    result[key] = filteredVal;
+                }
+            }
+            return result;
+        }
+
+        console.log(data);
+
+
+    } catch (err) {
+        console.error('Fehler beim Laden des Rundown:', err);
+    }
+}
+
+function resetView() {
+    document.querySelector('.updateTitelNow').textContent = "--";
+    document.querySelector('.updateTitelNext').textContent = "--";
+    document.querySelector('.aktueller-block').textContent = "--";
+    document.querySelector('.cue-info-aktuell').innerHTML = "";
+    document.querySelector('.cue-info-next').innerHTML = "";
+    document.querySelector('.aktueller-cue-fortschritt').style.width = `0%`;
+    document.querySelector('.stage_time_next_start').textContent = "--:--:--";
+    document.querySelector('.stage_time_next_ende').textContent = "--:--:--";
+    document.querySelector('.stage_time_next').textContent = "--:--:--";
+    document.querySelector('.block-zeit').textContent = "--:--:--";
+
 }
 
 // WebSocket connection & reconnection logic
@@ -275,8 +365,8 @@ function connectWebSocket() {
 
     ws.onopen = () => {
         console.log('WebSocket connected to', url);
-        //makeTitleCardBlinkGreen();            // blink cue card
-        fetchProjectName();                  // load project title via REST
+        //makeTitleCardBlinkGreen();
+        fetchProjectName();
     };
 
     ws.onclose = e => {
@@ -312,6 +402,10 @@ function connectWebSocket() {
                 updateOffset(payload.offset);
                 offset = payload.offset;
                 updatePosition(payload.selectedEventIndex, payload.numEvents)
+                updateNextTwoCues(payload.selectedEventIndex);
+                if (payload.selectedEventIndex == null) {
+                    resetView();
+                }
                 break;
             case 'ontime':
                 console.log('ontime');
@@ -342,6 +436,8 @@ function connectWebSocket() {
                 updateNextStart(payload.timeStart - offset);
                 updateNextInfos(payload.custom);
                 break;
+            case 'ontime-currentBlock':
+                updateAktuellerBlock(payload.block.title);
             default:
                 console.debug('Unhandled WS type:', type);
                 console.log(payload);

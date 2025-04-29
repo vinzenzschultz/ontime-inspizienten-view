@@ -72,6 +72,9 @@ body {
   padding-bottom: 4px;
   margin-bottom: 0px;
   border-bottom: 2px solid #101010;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .cue-times {
@@ -253,7 +256,7 @@ body {
   display: flex;
   flex-direction: column;
   /* Label oben, Text darunter */
-  gap: 8px;
+  gap: 5px;
   /* Abstand zwischen Label und Text */
   background: rgba(255, 255, 255, 0.07);
   border-radius: 8px;
@@ -274,7 +277,7 @@ body {
 .demnaechst__text {
   width: 100%;
   color: rgba(255, 255, 255, 0.6);
-  line-height: 0.9;
+  line-height: 1.2;
   font-size: 20px;
 }
 
@@ -361,6 +364,10 @@ body {
   color: rgb(51, 158, 78);
 }
 
+.beschriftung_blau {
+  color: rgb(62, 117, 232);
+}
+
 .werte {
   color: var(--color-override, rgba(255, 255, 255, 0.8));
 }
@@ -396,4 +403,11 @@ body {
       rgba(255, 255, 255, 0.07)
     );
   }
+}
+
+.goto-list .goto-item:not(:last-child) {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.25);
 }

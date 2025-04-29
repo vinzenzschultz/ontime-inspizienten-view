@@ -9,7 +9,8 @@ function updateTitelNow(name) {
   if (name == null) {
     document.querySelector(".updateTitelNow").textContent = "--";
   } else {
-    document.querySelector(".updateTitelNow").innerHTML = '<span class="beschriftung_dunkler paddingRechts">Jetzt</span>' + name;
+    document.querySelector(".updateTitelNow").innerHTML =
+      '<span class="beschriftung_dunkler paddingRechts">Jetzt</span>' + name;
     makeTitleCardBlinkGreen();
   }
 }
@@ -26,7 +27,8 @@ function updateTitelNext(name) {
   if (name == null) {
     document.querySelector(".updateTitelNext").textContent = "--";
   } else {
-    document.querySelector(".updateTitelNext").innerHTML = '<span class="beschriftung_dunkler paddingRechts">Next</span>' + name;
+    document.querySelector(".updateTitelNext").innerHTML =
+      '<span class="beschriftung_dunkler paddingRechts">Next</span>' + name;
   }
 }
 
@@ -255,7 +257,7 @@ function updateClock(clockMs) {
 }
 
 // Blink the current cue card green briefly
-function makeTitleCardBlinkGreen() {
+async function makeTitleCardBlinkGreen() {
   const el = document.querySelector(".aktueller-cue");
   if (el) {
     el.classList.add("blink");
@@ -382,11 +384,13 @@ function updateUpcomingLabels(events = [], currentEventId) {
 
   // Wenn nicht gefunden, setzen wir idx auf -1, damit slice bei 0 losgeht
   let i;
-  if (events[idx + 1].type == "block") {
-    i = 3;
-  } else {
-    i = 2;
-  }
+  try {
+    if (events[idx + 1].type == "block") {
+      i = 3;
+    } else {
+      i = 2;
+    }
+  } catch {}
   const start = idx >= 0 ? idx + i : 0;
 
   // 2. Nächste zwei Events ab diesem Punkt entnehmen
@@ -455,6 +459,7 @@ function connectWebSocket() {
   let blocktime = null;
   let nextStart;
   let nextEnde;
+  let nextEvent;
 
   ws.onmessage = ({ data }) => {
     let msg;
@@ -476,8 +481,10 @@ function connectWebSocket() {
         updateexpectedFinish(payload.expectedFinish);
         updateCueStart(payload.startedAt);
         updateProgressBar(payload.elapsed, payload.duration);
-        updateNextFinish(nextEnde - offset);
-        updateNextStart(nextStart - offset);
+        if (nextEvent) {
+          updateNextFinish(nextEnde - offset);
+          updateNextStart(nextStart - offset);
+        }
         break;
       case "ontime-runtime":
         updateOffset(payload.offset);
@@ -496,6 +503,7 @@ function connectWebSocket() {
         updateOffset(payload.runtime.offset);
         offset = payload.runtime.offset;
         if (payload.eventNext) {
+          nextEvent = true;
           updateTitelNext(payload.eventNext.title);
           updateTimerNext(payload.eventNext.duration);
           nextStart = payload.eventNext.timeStart;
@@ -519,14 +527,21 @@ function connectWebSocket() {
         }
         break;
       case "ontime-eventNow":
-        updateTitelNow(payload.title);
-        updateInfos(payload.custom);
-        fetchRundownAndUpdate(payload.id);
+        if (payload == null) {
+          resetView();
+          nextEvent = false;
+        } else {
+          updateTitelNow(payload.title);
+          updateInfos(payload.custom);
+          fetchRundownAndUpdate(payload.id);
+        }
         break;
       case "ontime-eventNext":
         if (payload == null) {
           resetViewNext();
+          nextEvent = false;
         } else {
+          nextEvent = true;
           updateTitelNext(payload.title);
           updateTimerNext(payload.duration);
           nextEnde = payload.timeEnd;
@@ -552,19 +567,16 @@ function connectWebSocket() {
   };
 }
 
-// Initialize
+
+const LOCK_TIMEOUT = 3000; // 5 seconds
 
 // ----- HTTP Command Functions -----
 async function sendBackCommandHttp() {
   try {
-    const res = await fetch("/api/start/previous", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-    if (!res.ok) throw new Error(`Server antwortete mit ${res.status}`);
-    // console.log("Back-Befehl gesendet");
+    const res = await fetch("/api/start/previous", { method: "GET" });
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
   } catch (err) {
-    // console.error("Fehler beim Back-Befehl:", err);
+    console.error("Error sending Back command:", err);
   }
 }
 
@@ -572,27 +584,19 @@ async function sendPauseCommandHttp() {
   try {
     document.getElementById("start-btn").style.display = "block";
     document.getElementById("pause-btn").style.display = "none";
-    const res = await fetch("/api/pause", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-    if (!res.ok) throw new Error(`Server antwortete mit ${res.status}`);
-    // console.log("Pause-Befehl gesendet");
+    const res = await fetch("/api/pause", { method: "GET" });
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
   } catch (err) {
-    // console.error("Fehler beim Pause-Befehl:", err);
+    console.error("Error sending Pause command:", err);
   }
 }
 
 async function sendGoCommandHttp() {
   try {
-    const res = await fetch("/api/start/next", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-    if (!res.ok) throw new Error(`Server antwortete mit ${res.status}`);
-    // console.log("Go-Befehl gesendet");
+    const res = await fetch("/api/start/next", { method: "GET" });
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
   } catch (err) {
-    // console.error("Fehler beim Go-Befehl:", err);
+    console.error("Error sending Go command:", err);
   }
 }
 
@@ -600,54 +604,127 @@ async function sendStartCommandHttp() {
   try {
     document.getElementById("start-btn").style.display = "none";
     document.getElementById("pause-btn").style.display = "block";
-    const res = await fetch("/api/start", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-    if (!res.ok) throw new Error(`Server antwortete mit ${res.status}`);
-    // console.log("Start-Befehl gesendet");
+    const res = await fetch("/api/start", { method: "GET" });
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+    makeTitleCardBlinkGreen();
   } catch (err) {
-    // console.error("Fehler beim Start-Befehl:", err);
+    console.error("Error sending Start command:", err);
   }
 }
 
-// ----- Lock Logic -----
-const LOCK_TIMEOUT = 3000; // 5 Sekunden
+async function sendGotoCommandHttp(id) {
+  try {
+    document.getElementById("start-btn").style.display = "block";
+    document.getElementById("pause-btn").style.display = "none";
+    const res = await fetch(`/api/load/id/${id}`, { method: "GET" });
+    if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+  } catch (err) {
+    console.error("Error sending Goto command:", err);
+  }
+}
 
+// ----- Goto Dropdown -----
+function toggleGotoList() {
+  const existing = document.querySelector(".goto-list");
+  if (existing) {
+    existing.remove();
+    document.removeEventListener("click", outsideClickListener);
+    return;
+  }
+  const gotoBtn = document.getElementById("goto-btn");
+  if (!gotoBtn) return;
+  const list = document.createElement("div");
+  list.className = "goto-list";
+  // fetch rundown
+  fetch("/data/rundown")
+    .then((res) => res.json())
+    .then((data) => {
+      const events = Array.isArray(data)
+        ? data
+        : Array.isArray(data.rundown)
+        ? data.rundown
+        : [];
+      events.forEach((evt) => {
+        const item = document.createElement("div");
+        if (evt.type == "block") {
+          item.className = "goto-item beschriftung_dunkler";
+          let titel = evt.title || evt.name || "--";
+          item.textContent = titel + " [Block]";
+        } else {
+          item.className = "goto-item";
+          item.textContent = evt.title || evt.name || "--";
+        }
+        if (evt.type != "block") {
+          item.addEventListener("click", () => {
+            sendGotoCommandHttp(evt.id);
+            toggleGotoList();
+          });
+        }
+        list.append(item);
+      });
+    })
+    .catch((err) => console.error("Error loading rundown for Goto:", err));
+  // position list over button
+  gotoBtn.parentElement.style.position = "relative";
+  list.style.position = "absolute";
+  list.style.bottom = "105%";
+  list.style.left = "42%";
+  list.style.transform = "translateX(-37%)";
+  list.style.background = "#101010";
+  list.style.color = "rgba(255, 255, 255, 0.45)";
+  list.style.border = "1px solid #101010";
+  list.style.borderRadius = "4px";
+  list.style.maxHeight = "60vh";
+  list.style.overflowY = "auto";
+  list.style.boxShadow = "0 2px 8px #101010";
+  list.style.zIndex = "1000";
+  list.style.padding = "10px";
+  list.style.fontSize = "20px";
+  gotoBtn.parentElement.append(list);
+  document.addEventListener("click", outsideClickListener);
+}
+
+function outsideClickListener(e) {
+  const list = document.querySelector(".goto-list");
+  if (list && !list.contains(e.target) && e.target.id !== "goto-btn") {
+    toggleGotoList();
+  }
+}
+
+// ----- Setup Control Buttons -----
 window.addEventListener("load", () => {
   const lockBtn = document.getElementById("lock-btn");
   const backBtn = document.getElementById("back-btn");
   const pauseBtn = document.getElementById("pause-btn");
   const goBtn = document.getElementById("go-ontime-btn");
   const startBtn = document.getElementById("start-btn");
+  const gotoBtn = document.getElementById("goto-btn");
 
-  const controlButtons = [backBtn, pauseBtn, goBtn, startBtn];
+  const controlButtons = [backBtn, pauseBtn, goBtn, startBtn, gotoBtn];
 
-  // 1) Beim Laden ist alles gelockt:
+  // initial lock
   lockBtn.classList.add("locked");
   controlButtons.forEach((btn) => (btn.disabled = true));
 
-  // 2) Lock-Button klick: entsperren und Klasse entfernen
+  // lock toggle
   lockBtn.addEventListener("click", () => {
     controlButtons.forEach((btn) => (btn.disabled = false));
-
-    lockBtn.classList.remove("locked"); // grün weg
-    //   console.log(`Controls unlocked für ${LOCK_TIMEOUT/1000} Sekunden`);
-
-    // 3) Nach Timeout wieder sperren und Klasse zurücksetzen
+    lockBtn.classList.remove("locked");
     setTimeout(() => {
       controlButtons.forEach((btn) => (btn.disabled = true));
-
-      lockBtn.classList.add("locked"); // wieder grün
-      // console.log("Controls locked");
+      lockBtn.classList.add("locked");
     }, LOCK_TIMEOUT);
   });
 
-  // restliche Button-Handler…
+  // command handlers
   backBtn.addEventListener("click", sendBackCommandHttp);
   pauseBtn.addEventListener("click", sendPauseCommandHttp);
   goBtn.addEventListener("click", sendGoCommandHttp);
   startBtn.addEventListener("click", sendStartCommandHttp);
+  gotoBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleGotoList();
+  });
 });
 
 connectWebSocket();

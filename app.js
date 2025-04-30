@@ -1,6 +1,5 @@
 const leftPad = (num) => String(num).padStart(2, "0");
 
-// Update project title in the header
 function updateProjectHeader(name) {
   document.getElementById("projekttitel").innerText = name;
 }
@@ -229,7 +228,6 @@ const updateProgressBar = (elapsed, duration) => {
   }
 };
 
-// Fetch project name via REST endpoint, since WS payload doesn't include it
 const fetchProjectName = async () => {
   try {
     const response = await fetch(`/data/project`);
@@ -245,7 +243,6 @@ const fetchProjectName = async () => {
   }
 };
 
-// Update the live clock from WS payload (ms since midnight)
 function updateClock(clockMs) {
   const el = document.querySelector(".uhr__time");
   if (!el) return;
@@ -256,7 +253,6 @@ function updateClock(clockMs) {
   el.textContent = `${hh}:${mm}:${ss}`;
 }
 
-// Blink the current cue card green briefly
 async function makeTitleCardBlinkGreen() {
   const el = document.querySelector(".aktueller-cue");
   if (el) {
@@ -266,11 +262,9 @@ async function makeTitleCardBlinkGreen() {
 }
 
 async function updateInfos(customData) {
-  // 1) Container auswählen
   const container = document.querySelector(".cue-info-aktuell");
   if (!container) return;
 
-  // 2) Farben per HTTP laden
   let colorMap = {};
   try {
     const res = await fetch("/data/custom-fields", {
@@ -285,21 +279,17 @@ async function updateInfos(customData) {
     console.error("Fehler beim Laden der Custom-Farben:", err);
   }
 
-  // 3) Alte Einträge entfernen
   container.innerHTML = "";
 
-  // 4) Neue Einträge bauen
   Object.entries(customData).forEach(([key, value]) => {
     const wrapper = document.createElement("div");
 
-    // Label mit Farbe aus colorMap (Fallback #888)
     const label = document.createElement("span");
     label.classList.add("cue-infos__label");
     label.textContent = key;
     label.style.backgroundColor =
       colorMap[key].colour || "rgba(255, 255, 255, 0.8)";
 
-    // Text
     const text = document.createElement("div");
     text.classList.add("cue-infos__text", "beschriftung");
     text.textContent = value;
@@ -310,11 +300,9 @@ async function updateInfos(customData) {
 }
 
 async function updateNextInfos(customData) {
-  // 1) Container auswählen
   const container = document.querySelector(".cue-info-next");
   if (!container) return;
 
-  // 2) Farben per HTTP laden
   let colorMap = {};
   try {
     const res = await fetch("/data/custom-fields", {
@@ -329,21 +317,17 @@ async function updateNextInfos(customData) {
     console.error("Fehler beim Laden der Custom-Farben:", err);
   }
 
-  // 3) Alte Einträge entfernen
   container.innerHTML = "";
 
-  // 4) Neue Einträge bauen
   Object.entries(customData).forEach(([key, value]) => {
     const wrapper = document.createElement("div");
 
-    // Label mit Farbe aus colorMap (Fallback #888)
     const label = document.createElement("span");
     label.classList.add("cue-infos__label");
     label.textContent = key;
     label.style.backgroundColor =
       colorMap[key].colour || "rgba(255, 255, 255, 0.8)";
 
-    // Text
     const text = document.createElement("div");
     text.classList.add("cue-infos__text", "beschriftung");
     text.textContent = value;
@@ -363,7 +347,6 @@ async function fetchRundownAndUpdate(currentEventId) {
       return;
     }
     const data = await res.json();
-    // Dein API liefert evtl. direkt ein Array oder ein Objekt { rundown: [...] }
     const events = Array.isArray(data)
       ? data
       : Array.isArray(data.rundown)
@@ -379,10 +362,8 @@ async function fetchRundownAndUpdate(currentEventId) {
 function updateUpcomingLabels(events = [], currentEventId) {
   if (!Array.isArray(events)) events = [];
 
-  // 1. Finde Index des aktuellen Events
   const idx = events.findIndex((event) => event.id === currentEventId);
 
-  // Wenn nicht gefunden, setzen wir idx auf -1, damit slice bei 0 losgeht
   let i;
   try {
     if (events[idx + 1].type == "block") {
@@ -393,15 +374,12 @@ function updateUpcomingLabels(events = [], currentEventId) {
   } catch {}
   const start = idx >= 0 ? idx + i : 0;
 
-  // 2. Nächste zwei Events ab diesem Punkt entnehmen
   const nextTwo = events.slice(start, start + 2);
 
-  // 3. In die Labels schreiben (FALLBACK '--')
   nextTwo.forEach((evt, i) => {
     const labelEl = document.querySelector(`.demnaechsttext${i + 1}`);
     labelEl.textContent = evt?.title ?? "--";
 
-    // Falls Event ein Block ist, span hinzufügen
     if (evt?.type === "block") {
       const span = document.createElement("span");
       span.classList.add("beschriftung_dunkler");
@@ -410,7 +388,6 @@ function updateUpcomingLabels(events = [], currentEventId) {
     }
   });
 
-  // 4. Falls weniger als zwei Events vorhanden, restliche Labels auf '--' setzen
   for (let i = nextTwo.length; i < 2; i++) {
     const labelEl = document.querySelector(`.demnaechsttext${i + 1}`);
     if (labelEl) labelEl.textContent = "--";
@@ -436,7 +413,6 @@ function resetViewNext() {
   document.querySelector(".demnaechsttext2").textContent = "--";
 }
 
-// WebSocket connection & reconnection logic
 function connectWebSocket() {
   const protocol = location.protocol === "https:" ? "wss" : "ws";
   const url = `${protocol}://${location.hostname}:${location.port}/ws`;
@@ -567,10 +543,8 @@ function connectWebSocket() {
   };
 }
 
+const LOCK_TIMEOUT = 3000;
 
-const LOCK_TIMEOUT = 3000; // 5 seconds
-
-// ----- HTTP Command Functions -----
 async function sendBackCommandHttp() {
   try {
     const res = await fetch("/api/start/previous", { method: "GET" });
@@ -623,7 +597,6 @@ async function sendGotoCommandHttp(id) {
   }
 }
 
-// ----- Goto Dropdown -----
 function toggleGotoList() {
   const existing = document.querySelector(".goto-list");
   if (existing) {
@@ -635,7 +608,6 @@ function toggleGotoList() {
   if (!gotoBtn) return;
   const list = document.createElement("div");
   list.className = "goto-list";
-  // fetch rundown
   fetch("/data/rundown")
     .then((res) => res.json())
     .then((data) => {
@@ -664,7 +636,6 @@ function toggleGotoList() {
       });
     })
     .catch((err) => console.error("Error loading rundown for Goto:", err));
-  // position list over button
   gotoBtn.parentElement.style.position = "relative";
   list.style.position = "absolute";
   list.style.bottom = "105%";
@@ -691,7 +662,6 @@ function outsideClickListener(e) {
   }
 }
 
-// ----- Setup Control Buttons -----
 window.addEventListener("load", () => {
   const lockBtn = document.getElementById("lock-btn");
   const backBtn = document.getElementById("back-btn");
@@ -702,11 +672,9 @@ window.addEventListener("load", () => {
 
   const controlButtons = [backBtn, pauseBtn, goBtn, startBtn, gotoBtn];
 
-  // initial lock
   lockBtn.classList.add("locked");
   controlButtons.forEach((btn) => (btn.disabled = true));
 
-  // lock toggle
   lockBtn.addEventListener("click", () => {
     controlButtons.forEach((btn) => (btn.disabled = false));
     lockBtn.classList.remove("locked");
@@ -716,7 +684,6 @@ window.addEventListener("load", () => {
     }, LOCK_TIMEOUT);
   });
 
-  // command handlers
   backBtn.addEventListener("click", sendBackCommandHttp);
   pauseBtn.addEventListener("click", sendPauseCommandHttp);
   goBtn.addEventListener("click", sendGoCommandHttp);

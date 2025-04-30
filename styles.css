@@ -11,7 +11,6 @@ body {
   background: #101010;
 }
 
-/* Haupt-Grid: 2 Spalten, 3 Zeilen (8px Balken + zwei gleich große Reihen) */
 .container {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -25,13 +24,10 @@ body {
   min-width: 0;
 }
 
-/* LINKER BEREICH als eigenes Grid mit 2 Spalten für die Video-Zeile */
 .left {
   grid-column: 1;
   grid-row: 1 / span 3;
   display: grid;
-  /* 2 Spalten: 3fr für Haupt-Video, 1fr für Sidebar */
-  /* 3 Zeilen: 8px Balken, 1fr Cue, 1fr Video+Sidebar */
   grid-template-columns: 6fr 1fr;
   grid-template-rows: 13px 45vh 1fr;
   gap: 10px;
@@ -104,7 +100,6 @@ body {
   font-size: 0.8em;
   font-weight: bold;
   text-transform: uppercase;
-  /* background-color: rgb(51, 158, 78); */
   border-radius: 3px;
   padding: 2px 4px;
   align-self: flex-start;
@@ -128,19 +123,16 @@ body {
   gap: 0px;
 }
 
-/* Label oben (kleiner, transparent) */
 .zeit__label {
   font-size: 0.75em;
   text-transform: uppercase;
   color: rgba(0, 0, 0, 0.6);
 }
 
-/* Wert unten (größer, tabular nums) */
 .zeit__value {
   font-size: 1em;
   font-variant-numeric: tabular-nums;
   color: #000;
-  /* oder deine Wunsch-Farbe */
 }
 
 .video-inner {
@@ -151,7 +143,6 @@ body {
   justify-content: center;
   color: #fff;
   font-size: 1.2em;
-  /* aspect-ratio: 16 / 9; */
 }
 
 .video-sidebar {
@@ -221,17 +212,14 @@ body {
   text-transform: uppercase;
 }
 
-/* kleines Label oben */
 .uhr__label {
   font-size: 0.875em;
   font-weight: bold;
   color: rgba(255, 255, 255, 0.6);
   align-self: flex-start;
   margin-top: 1px;
-  /* links oben */
 }
 
-/* Zeitanzeige darunter */
 .uhr__time {
   font-size: 1.5em;
   font-variant-numeric: tabular-nums;
@@ -252,28 +240,21 @@ body {
 
 .demnaechst {
   padding: 10px;
-  /* rundum etwas Luft */
   display: flex;
   flex-direction: column;
-  /* Label oben, Text darunter */
   gap: 5px;
-  /* Abstand zwischen Label und Text */
   background: rgba(255, 255, 255, 0.07);
   border-radius: 8px;
-  /* die Grid-Position (column/row) bleibt unverändert */
 }
 
-/* das kleine Label oben links */
 .demnaechst__label {
   font-size: 0.875em;
   font-weight: bold;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.25);
   align-self: flex-start;
-  /* ganz links in der Box */
 }
 
-/* der variable Text darunter */
 .demnaechst__text {
   width: 100%;
   color: rgba(255, 255, 255, 0.6);
@@ -323,11 +304,8 @@ body {
 
 .control-btn {
   flex: 1;
-  /* alle Buttons gleich breit */
   height: 100%;
-  /* volle Höhe des .controls-Containers */
   font-size: 1.25em;
-  /* größere Schrift */
   background: rgba(255, 255, 255, 0.1);
   border: none;
   border-radius: 4px;

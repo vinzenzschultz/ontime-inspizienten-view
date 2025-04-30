@@ -1,6 +1,6 @@
 # Ontime Inspizienten View
 
-TBC
+An Ontime View für managing an event with stage live view.
 
 ## Third-Party Licenses
 

@@ -1,7 +1,8 @@
-# Ontime Inspizienten View
+# Ontime Stage Management View
 
-An Ontime View für managing an event with stage live view.
-<img width="983" height="752" alt="beispielbild-ansicht" src="https://github.com/user-attachments/assets/3f86c787-e5b3-4aee-af92-9089ac5b5f7f" />
+An Ontime view for managing an event with stage live view and custom fields.  
+  
+<img width="500" height="auto" alt="beispielbild-ansicht" src="https://github.com/user-attachments/assets/3f86c787-e5b3-4aee-af92-9089ac5b5f7f" />
 
 ## Third-Party Licenses
 
